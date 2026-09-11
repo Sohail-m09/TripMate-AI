@@ -1,7 +1,12 @@
-from langchain.messages import (
+import asyncio
+from tripmate.schemas import TravelAgentResponse
+from langchain_core.messages import (
     HumanMessage,
     SystemMessage,
     ToolMessage,
+)
+from tripmate.agents.prompts import (
+    FLIGHT_AGENT_PROMPT,
 )
 from tripmate.agents.message_utils import (
     extract_message_text,
@@ -9,17 +14,16 @@ from tripmate.agents.message_utils import (
 
 from tripmate.llm.model import get_gemini_model
 from tripmate.mcp.client import get_mcp_tools
-from tripmate.schemas import TravelAgentResponse
 
 
-async def run_travel_agent(
+async def run_flight_agent(
     user_query: str,
 ) -> TravelAgentResponse:
 
     model = get_gemini_model()
 
     tools = await get_mcp_tools(
-        "utility"
+        "flight"
     )
 
     tools_by_name = {
@@ -27,21 +31,20 @@ async def run_travel_agent(
         for tool in tools
     }
 
-    model_with_tools = model.bind_tools(tools)
+    model_with_tools = model.bind_tools(
+        tools
+    )
+
+    tools_used = []
 
     messages = [
         SystemMessage(
-            content=(
-                "You are TripMate, an AI travel planning assistant. "
-                "Use the available tools whenever they are useful. "
-                "Do not perform deterministic calculations manually "
-                "when an appropriate tool is available."
-            )
+            content=FLIGHT_AGENT_PROMPT
         ),
-        HumanMessage(content=user_query),
+        HumanMessage(
+            content=user_query
+        ),
     ]
-
-    tools_used = []
 
     for _ in range(3):
 
@@ -52,7 +55,6 @@ async def run_travel_agent(
         messages.append(response)
 
         if not response.tool_calls:
-
             return TravelAgentResponse(
                 answer=extract_message_text(
                     response.content
@@ -65,6 +67,16 @@ async def run_travel_agent(
 
             tool_name = tool_call["name"]
 
+            if tool_name not in tools_by_name:
+                return TravelAgentResponse(
+                    answer=(
+                        f"Flight tool '{tool_name}' "
+                        "is not available."
+                    ),
+                    tools_used=tools_used,
+                    is_complete=False,
+                )
+
             selected_tool = tools_by_name[
                 tool_name
             ]
@@ -73,7 +85,9 @@ async def run_travel_agent(
                 tool_call["args"]
             )
 
-            tools_used.append(tool_name)
+            tools_used.append(
+                tool_name
+            )
 
             messages.append(
                 ToolMessage(
@@ -83,7 +97,26 @@ async def run_travel_agent(
             )
 
     return TravelAgentResponse(
-        answer="The agent could not complete the request.",
-        tools_used=tools_used,
+        answer=(
+            "The Flight Agent could not "
+            "complete the request."
+        ),
+        tools_used=tools_used,  
         is_complete=False,
     )
+
+
+async def main() -> None:
+
+    result = await run_flight_agent(
+        (
+            "Find flights from BOM to GOI "
+            "on 2026-10-10."
+        )
+    )
+
+    print(result.model_dump())
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

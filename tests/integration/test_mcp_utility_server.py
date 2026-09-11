@@ -1,12 +1,16 @@
 import pytest
 
-from tripmate.mcp.client import get_mcp_tools
+from tripmate.mcp.client import (
+    get_mcp_tools,
+)
 
 
 @pytest.mark.asyncio
 async def test_trip_duration_mcp_tool():
 
-    tools = await get_mcp_tools()
+    tools = await get_mcp_tools(
+        "utility"
+    )
 
     duration_tool = next(
         tool
@@ -21,4 +25,7 @@ async def test_trip_duration_mcp_tool():
         }
     )
 
-    assert "6 days and 5 nights" in str(result)
+    assert (
+        "6 days and 5 nights"
+        in str(result)
+    )

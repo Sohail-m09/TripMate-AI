@@ -8,6 +8,7 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL")
+SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")
 
 
 if not GEMINI_API_KEY:
@@ -15,3 +16,8 @@ if not GEMINI_API_KEY:
 
 if not GEMINI_MODEL:
     raise ValueError("GEMINI_MODEL is not set in the .env file.")
+
+if not SERPAPI_API_KEY:
+    raise ValueError(
+        "SERPAPI_API_KEY is not set in the .env file."
+    )

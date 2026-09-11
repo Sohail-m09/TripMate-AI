@@ -11,7 +11,42 @@ Requires-Dist: pydantic>=2.0
 Requires-Dist: python-dotenv>=1.0
 Requires-Dist: mcp[cli]<2,>=1.24
 Requires-Dist: langchain-mcp-adapters<0.4,>=0.3.2
+Requires-Dist: httpx>=0.28
 Provides-Extra: dev
 Requires-Dist: pytest>=8.0; extra == "dev"
 Requires-Dist: pytest-asyncio>=0.24; extra == "dev"
 Requires-Dist: ruff>=0.8; extra == "dev"
+
+# TripMate AI
+
+TripMate AI is a modular Agentic AI travel planning system being built using LangGraph, LangChain, Gemini, and Model Context Protocol (MCP).
+
+## Current Features
+
+- Gemini-powered travel agent
+- Dynamic tool selection
+- Trip duration calculation
+- Trip budget calculation
+- MCP server using FastMCP
+- MCP tool discovery using LangChain MCP adapters
+- stdio-based MCP communication
+- Structured agent responses using Pydantic
+- Unit and integration testing with pytest
+
+## Current Architecture
+
+User Request
+→ Gemini Agent
+→ LangChain MCP Adapter
+→ MCP Server
+→ Travel Tool
+→ MCP Result
+→ Gemini
+→ Structured Response
+
+## Development Status
+
+- Phase 0 — Project Foundation ✅
+- Phase 1 — Agent Fundamentals ✅
+- Phase 2 — MCP Fundamentals ✅
+- Phase 3 — LangGraph State & Workflow ⏳
