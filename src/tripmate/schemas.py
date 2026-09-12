@@ -130,3 +130,56 @@ class PlacesSearchResult(BaseModel):
         default_factory=list
     )
     error: str | None = None
+
+class TripRequest(BaseModel):
+    origin: str | None = Field(
+        default=None,
+        description=(
+            "Trip origin or departure location."
+        ),
+    )
+
+    destination: str | None = Field(
+        default=None,
+        description=(
+            "Trip destination."
+        ),
+    )
+
+    start_date: str | None = Field(
+        default=None,
+        description=(
+            "Trip start date in YYYY-MM-DD format "
+            "when provided."
+        ),
+    )
+
+    end_date: str | None = Field(
+        default=None,
+        description=(
+            "Trip end date in YYYY-MM-DD format "
+            "when provided."
+        ),
+    )
+
+    budget: float | None = Field(
+        default=None,
+        description=(
+            "Total trip budget when explicitly "
+            "provided by the user."
+        ),
+    )
+
+    adults: int | None = Field(
+        default=None,
+        description=(
+            "Number of adult travelers when provided."
+        ),
+    )
+
+    children: int | None = Field(
+        default=None,
+        description=(
+            "Number of child travelers when provided."
+        ),
+    )

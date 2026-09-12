@@ -1,5 +1,4 @@
 from typing import Literal
-
 from tripmate.state import TravelState
 
 
@@ -63,5 +62,19 @@ def route_after_aggregation(
 
     if "itinerary" in required_agents:
         return "itinerary"
+
+    return "end"
+
+def route_after_validation(
+    state: TravelState,
+) -> Literal[
+    "continue",
+    "end",
+]:
+
+    if state.get(
+        "request_valid"
+    ):
+        return "continue"
 
     return "end"

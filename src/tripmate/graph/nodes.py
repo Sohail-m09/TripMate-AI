@@ -7,17 +7,60 @@ from tripmate.agents.hotel_agent import (
 from tripmate.agents.itinerary_agent import (
     run_itinerary_agent,
 )
+from tripmate.agents.orchestrator_agent import (
+    run_orchestrator,
+)
 from tripmate.agents.places_agent import (
     run_places_agent,
+)
+from tripmate.agents.trip_request_agent import (
+    extract_trip_request,
 )
 from tripmate.agents.weather_agent import (
     run_weather_agent,
 )
-from tripmate.agents.orchestrator_agent import (
-    run_orchestrator,
+
+from tripmate.graph.agent_inputs import (
+    build_flight_agent_input,
+    build_hotel_agent_input,
+    build_places_agent_input,
+    build_weather_agent_input,
 )
-from tripmate.state import TravelState
+from tripmate.graph.validation import (
+    validate_trip_request,
+)
+
 from tripmate.schemas import TravelAgentResponse
+from tripmate.state import TravelState
+
+
+# -------------------------------------------------
+# Trip request extraction
+# -------------------------------------------------
+
+async def trip_request_node(
+    state: TravelState,
+) -> dict:
+
+    trip_request = await extract_trip_request(
+        state["user_query"]
+    )
+
+    return {
+        "trip_request": trip_request,
+        "origin": trip_request.origin,
+        "destination": trip_request.destination,
+        "start_date": trip_request.start_date,
+        "end_date": trip_request.end_date,
+        "budget": trip_request.budget,
+        "adults": trip_request.adults,
+        "children": trip_request.children,
+    }
+
+
+# -------------------------------------------------
+# Orchestrator
+# -------------------------------------------------
 
 async def orchestrator_node(
     state: TravelState,
@@ -32,13 +75,65 @@ async def orchestrator_node(
     }
 
 
+# -------------------------------------------------
+# Request validation
+# -------------------------------------------------
+
+async def validation_node(
+    state: TravelState,
+) -> dict:
+
+    errors = validate_trip_request(
+        state
+    )
+
+    if errors:
+
+        error_message = (
+            "I need some additional information "
+            "before I can continue:\n- "
+            + "\n- ".join(errors)
+        )
+
+        return {
+            "request_valid": False,
+            "validation_errors": errors,
+            "final_response": error_message,
+        }
+
+    return {
+        "request_valid": True,
+        "validation_errors": [],
+    }
+
+
+# -------------------------------------------------
+# Dispatch
+# -------------------------------------------------
+
+async def dispatch_node(
+    state: TravelState,
+) -> dict:
+
+    return {}
+
+
+# -------------------------------------------------
+# Flight specialist
+# -------------------------------------------------
+
 async def flight_node(
     state: TravelState,
 ) -> dict:
 
     try:
+
+        flight_query = build_flight_agent_input(
+            state
+        )
+
         result = await run_flight_agent(
-            state["user_query"]
+            flight_query
         )
 
         if result.is_complete:
@@ -75,13 +170,22 @@ async def flight_node(
         }
 
 
+# -------------------------------------------------
+# Hotel specialist
+# -------------------------------------------------
+
 async def hotel_node(
     state: TravelState,
 ) -> dict:
 
     try:
+
+        hotel_query = build_hotel_agent_input(
+            state
+        )
+
         result = await run_hotel_agent(
-            state["user_query"]
+            hotel_query
         )
 
         if result.is_complete:
@@ -118,13 +222,22 @@ async def hotel_node(
         }
 
 
+# -------------------------------------------------
+# Weather specialist
+# -------------------------------------------------
+
 async def weather_node(
     state: TravelState,
 ) -> dict:
 
     try:
+
+        weather_query = build_weather_agent_input(
+            state
+        )
+
         result = await run_weather_agent(
-            state["user_query"]
+            weather_query
         )
 
         if result.is_complete:
@@ -161,13 +274,22 @@ async def weather_node(
         }
 
 
+# -------------------------------------------------
+# Places specialist
+# -------------------------------------------------
+
 async def places_node(
     state: TravelState,
 ) -> dict:
 
     try:
+
+        places_query = build_places_agent_input(
+            state
+        )
+
         result = await run_places_agent(
-            state["user_query"]
+            places_query
         )
 
         if result.is_complete:
@@ -202,6 +324,11 @@ async def places_node(
                 "places"
             ],
         }
+
+
+# -------------------------------------------------
+# Result aggregation
+# -------------------------------------------------
 
 async def aggregate_results_node(
     state: TravelState,
@@ -241,7 +368,6 @@ async def aggregate_results_node(
             )
         )
 
-
     if hotel_result:
 
         hotel_status = (
@@ -258,7 +384,6 @@ async def aggregate_results_node(
             )
         )
 
-
     if weather_result:
 
         weather_status = (
@@ -274,7 +399,6 @@ async def aggregate_results_node(
                 f"{weather_result.answer}"
             )
         )
-
 
     if places_result:
 
@@ -293,17 +417,21 @@ async def aggregate_results_node(
         )
 
     if sections:
+
         aggregated_context = "\n\n".join(
             sections
         )
+
     else:
+
         aggregated_context = (
             "No specialist information "
             "was required or available."
         )
 
     updates = {
-        "aggregated_context": aggregated_context
+        "aggregated_context":
+            aggregated_context
     }
 
     decision = state.get(
@@ -315,12 +443,17 @@ async def aggregate_results_node(
         or "itinerary"
         not in decision.required_agents
     ):
+
         updates["final_response"] = (
             aggregated_context
         )
 
     return updates
 
+
+# -------------------------------------------------
+# Itinerary specialist
+# -------------------------------------------------
 
 async def itinerary_node(
     state: TravelState,

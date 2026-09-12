@@ -6,17 +6,23 @@ from langgraph.graph import (
 
 from tripmate.graph.nodes import (
     aggregate_results_node,
+    dispatch_node,
     flight_node,
     hotel_node,
     itinerary_node,
     orchestrator_node,
     places_node,
+    trip_request_node,
+    validation_node,
     weather_node,
 )
+
 from tripmate.graph.routing import (
     route_after_aggregation,
+    route_after_validation,
     route_parallel_agents,
 )
+
 from tripmate.state import TravelState
 
 
@@ -29,8 +35,23 @@ def create_travel_graph() -> StateGraph:
     # Register nodes
 
     builder.add_node(
+        "trip_request",
+        trip_request_node,
+    )
+
+    builder.add_node(
         "orchestrator",
         orchestrator_node,
+    )
+
+    builder.add_node(
+        "validation",
+        validation_node,
+    )
+
+    builder.add_node(
+        "dispatch",
+        dispatch_node,
     )
 
     builder.add_node(
@@ -63,17 +84,48 @@ def create_travel_graph() -> StateGraph:
         itinerary_node,
     )
 
-    # Start with orchestrator
+    # -----------------------------------
+    # 1. Extract structured trip request
+    # -----------------------------------
 
     builder.add_edge(
         START,
+        "trip_request",
+    )
+
+    # -----------------------------------
+    # 2. Decide which agents are required
+    # -----------------------------------
+
+    builder.add_edge(
+        "trip_request",
         "orchestrator",
     )
 
-    # Fan out selected specialists in parallel
+    # -----------------------------------
+    # 3. Validate required information
+    # -----------------------------------
+
+    builder.add_edge(
+        "orchestrator",
+        "validation",
+    )
 
     builder.add_conditional_edges(
-        "orchestrator",
+        "validation",
+        route_after_validation,
+        {
+            "continue": "dispatch",
+            "end": END,
+        },
+    )
+
+    # -----------------------------------
+    # 4. Dispatch selected agents
+    # -----------------------------------
+
+    builder.add_conditional_edges(
+        "dispatch",
         route_parallel_agents,
         [
             "flight",
@@ -84,7 +136,9 @@ def create_travel_graph() -> StateGraph:
         ],
     )
 
-    # Fan in specialist results
+    # -----------------------------------
+    # 5. Fan-in specialist results
+    # -----------------------------------
 
     builder.add_edge(
         "flight",
@@ -106,7 +160,9 @@ def create_travel_graph() -> StateGraph:
         "aggregate",
     )
 
-    # Continue to itinerary only when required
+    # -----------------------------------
+    # 6. Continue to itinerary if needed
+    # -----------------------------------
 
     builder.add_conditional_edges(
         "aggregate",

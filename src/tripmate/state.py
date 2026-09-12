@@ -3,6 +3,7 @@ from operator import add
 from tripmate.schemas import (
     RoutingDecision,
     TravelAgentResponse,
+    TripRequest,
 )
 
 
@@ -11,12 +12,25 @@ class TravelState(TypedDict):
     # Original request
     user_query: str
 
+    trip_request: NotRequired[
+        TripRequest
+    ]
+
     # Trip information
     origin: NotRequired[str | None]
     destination: NotRequired[str | None]
     start_date: NotRequired[str | None]
     end_date: NotRequired[str | None]
     budget: NotRequired[float | None]
+    adults: NotRequired[int | None]
+    children: NotRequired[int | None]
+
+    # Request validation
+    request_valid: NotRequired[bool]
+
+    validation_errors: NotRequired[
+        list[str]
+    ]
 
     # Orchestrator routing decision
     routing_decision: NotRequired[
