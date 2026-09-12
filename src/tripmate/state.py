@@ -1,6 +1,9 @@
-from typing import NotRequired, TypedDict
-
-from tripmate.schemas import TravelAgentResponse
+from typing import NotRequired, TypedDict, Annotated
+from operator import add
+from tripmate.schemas import (
+    RoutingDecision,
+    TravelAgentResponse,
+)
 
 
 class TravelState(TypedDict):
@@ -15,14 +18,45 @@ class TravelState(TypedDict):
     end_date: NotRequired[str | None]
     budget: NotRequired[float | None]
 
+    # Orchestrator routing decision
+    routing_decision: NotRequired[
+        RoutingDecision
+    ]
+
+    completed_agents: Annotated[
+        list[str],
+        add,
+    ]
+
+    failed_agents: Annotated[
+        list[str],
+        add,
+    ]
+
     # Specialist agent results
-    flight_result: NotRequired[TravelAgentResponse]
-    hotel_result: NotRequired[TravelAgentResponse]
-    weather_result: NotRequired[TravelAgentResponse]
-    places_result: NotRequired[TravelAgentResponse]
+    flight_result: NotRequired[
+        TravelAgentResponse
+    ]
+
+    hotel_result: NotRequired[
+        TravelAgentResponse
+    ]
+
+    weather_result: NotRequired[
+        TravelAgentResponse
+    ]
+
+    places_result: NotRequired[
+        TravelAgentResponse
+    ]
+
+    # Aggregated specialist information
+    aggregated_context: NotRequired[str]
 
     # Itinerary result
-    itinerary_result: NotRequired[TravelAgentResponse]
+    itinerary_result: NotRequired[
+        TravelAgentResponse
+    ]
 
     # Final user-facing values
     itinerary: NotRequired[str]

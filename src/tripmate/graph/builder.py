@@ -5,11 +5,17 @@ from langgraph.graph import (
 )
 
 from tripmate.graph.nodes import (
+    aggregate_results_node,
     flight_node,
     hotel_node,
     itinerary_node,
+    orchestrator_node,
     places_node,
     weather_node,
+)
+from tripmate.graph.routing import (
+    route_after_aggregation,
+    route_parallel_agents,
 )
 from tripmate.state import TravelState
 
@@ -18,6 +24,13 @@ def create_travel_graph() -> StateGraph:
 
     builder = StateGraph(
         TravelState
+    )
+
+    # Register nodes
+
+    builder.add_node(
+        "orchestrator",
+        orchestrator_node,
     )
 
     builder.add_node(
@@ -41,33 +54,67 @@ def create_travel_graph() -> StateGraph:
     )
 
     builder.add_node(
+        "aggregate",
+        aggregate_results_node,
+    )
+
+    builder.add_node(
         "itinerary",
         itinerary_node,
     )
 
+    # Start with orchestrator
+
     builder.add_edge(
         START,
-        "flight",
+        "orchestrator",
     )
+
+    # Fan out selected specialists in parallel
+
+    builder.add_conditional_edges(
+        "orchestrator",
+        route_parallel_agents,
+        [
+            "flight",
+            "hotel",
+            "weather",
+            "places",
+            "aggregate",
+        ],
+    )
+
+    # Fan in specialist results
 
     builder.add_edge(
         "flight",
-        "hotel",
+        "aggregate",
     )
 
     builder.add_edge(
         "hotel",
-        "weather",
+        "aggregate",
     )
 
     builder.add_edge(
         "weather",
-        "places",
+        "aggregate",
     )
 
     builder.add_edge(
         "places",
-        "itinerary",
+        "aggregate",
+    )
+
+    # Continue to itinerary only when required
+
+    builder.add_conditional_edges(
+        "aggregate",
+        route_after_aggregation,
+        {
+            "itinerary": "itinerary",
+            "end": END,
+        },
     )
 
     builder.add_edge(

@@ -46,13 +46,26 @@ class TravelAgentResponse(BaseModel):
 
 class RoutingDecision(BaseModel):
     required_agents: list[
-        Literal["flight", "hotel", "weather", "places"]
+        Literal[
+            "flight",
+            "hotel",
+            "weather",
+            "places",
+            "itinerary",
+        ]
     ] = Field(
         default_factory=list,
         description=(
-            "Specialized agents required to handle "
+            "Specialist agents required to handle "
             "the user's travel request."
         ),
+    )
+
+    reason: str = Field(
+        description=(
+            "Short explanation for why these "
+            "specialist agents were selected."
+        )
     )
 
 class WeatherResult(BaseModel):
