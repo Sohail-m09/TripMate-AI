@@ -1,5 +1,10 @@
-from typing import NotRequired, TypedDict, Annotated
+from typing import (
+    Annotated,
+    NotRequired,
+    TypedDict,
+)
 from operator import add
+
 from tripmate.schemas import (
     RoutingDecision,
     TravelAgentResponse,
@@ -9,33 +14,85 @@ from tripmate.schemas import (
 
 class TravelState(TypedDict):
 
+    # -----------------------------------
     # Original request
+    # -----------------------------------
+
     user_query: str
 
     trip_request: NotRequired[
         TripRequest
     ]
 
-    # Trip information
-    origin: NotRequired[str | None]
-    destination: NotRequired[str | None]
-    start_date: NotRequired[str | None]
-    end_date: NotRequired[str | None]
-    budget: NotRequired[float | None]
-    adults: NotRequired[int | None]
-    children: NotRequired[int | None]
+    # -----------------------------------
+    # User / persistence information
+    # -----------------------------------
 
+    user_id: NotRequired[int]
+
+    trip_saved: NotRequired[bool]
+
+    saved_trip_id: NotRequired[int]
+
+    persistence_error: NotRequired[
+        str | None
+    ]
+
+    # -----------------------------------
+    # Trip information
+    # -----------------------------------
+
+    origin: NotRequired[
+        str | None
+    ]
+
+    destination: NotRequired[
+        str | None
+    ]
+
+    start_date: NotRequired[
+        str | None
+    ]
+
+    end_date: NotRequired[
+        str | None
+    ]
+
+    budget: NotRequired[
+        float | None
+    ]
+
+    adults: NotRequired[
+        int | None
+    ]
+
+    children: NotRequired[
+        int | None
+    ]
+
+    # -----------------------------------
     # Request validation
-    request_valid: NotRequired[bool]
+    # -----------------------------------
+
+    request_valid: NotRequired[
+        bool
+    ]
 
     validation_errors: NotRequired[
         list[str]
     ]
 
+    # -----------------------------------
     # Orchestrator routing decision
+    # -----------------------------------
+
     routing_decision: NotRequired[
         RoutingDecision
     ]
+
+    # -----------------------------------
+    # Parallel agent tracking
+    # -----------------------------------
 
     completed_agents: Annotated[
         list[str],
@@ -47,7 +104,10 @@ class TravelState(TypedDict):
         add,
     ]
 
+    # -----------------------------------
     # Specialist agent results
+    # -----------------------------------
+
     flight_result: NotRequired[
         TravelAgentResponse
     ]
@@ -64,14 +124,30 @@ class TravelState(TypedDict):
         TravelAgentResponse
     ]
 
+    # -----------------------------------
     # Aggregated specialist information
-    aggregated_context: NotRequired[str]
+    # -----------------------------------
 
+    aggregated_context: NotRequired[
+        str
+    ]
+
+    # -----------------------------------
     # Itinerary result
+    # -----------------------------------
+
     itinerary_result: NotRequired[
         TravelAgentResponse
     ]
 
+    # -----------------------------------
     # Final user-facing values
-    itinerary: NotRequired[str]
-    final_response: NotRequired[str]
+    # -----------------------------------
+
+    itinerary: NotRequired[
+        str
+    ]
+
+    final_response: NotRequired[
+        str
+    ]

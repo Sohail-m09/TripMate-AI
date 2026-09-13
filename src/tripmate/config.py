@@ -21,3 +21,12 @@ if not SERPAPI_API_KEY:
     raise ValueError(
         "SERPAPI_API_KEY is not set in the .env file."
     )
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL"
+)
+
+if not DATABASE_URL:
+    raise ValueError(
+        "DATABASE_URL is not set."
+    )

@@ -53,7 +53,7 @@ def route_after_aggregation(
     state: TravelState,
 ) -> Literal[
     "itinerary",
-    "end",
+    "persist",
 ]:
 
     required_agents = get_required_agents(
@@ -63,7 +63,7 @@ def route_after_aggregation(
     if "itinerary" in required_agents:
         return "itinerary"
 
-    return "end"
+    return "persist"
 
 def route_after_validation(
     state: TravelState,

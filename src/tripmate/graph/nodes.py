@@ -19,6 +19,9 @@ from tripmate.agents.trip_request_agent import (
 from tripmate.agents.weather_agent import (
     run_weather_agent,
 )
+from tripmate.database.trip_persistence import (
+    save_trip_from_state,
+)
 
 from tripmate.graph.agent_inputs import (
     build_flight_agent_input,
@@ -508,3 +511,26 @@ async def itinerary_node(
         "itinerary": result.answer,
         "final_response": result.answer,
     }
+
+async def persist_trip_node(
+    state: TravelState,
+) -> dict:
+
+    try:
+
+        trip_id = await save_trip_from_state(
+            state
+        )
+
+        return {
+            "trip_saved": True,
+            "saved_trip_id": trip_id,
+            "persistence_error": None,
+        }
+
+    except Exception as exc:
+
+        return {
+            "trip_saved": False,
+            "persistence_error": str(exc),
+        }

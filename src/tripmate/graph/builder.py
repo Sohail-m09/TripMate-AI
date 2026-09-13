@@ -11,6 +11,7 @@ from tripmate.graph.nodes import (
     hotel_node,
     itinerary_node,
     orchestrator_node,
+    persist_trip_node,
     places_node,
     trip_request_node,
     validation_node,
@@ -32,7 +33,9 @@ def create_travel_graph() -> StateGraph:
         TravelState
     )
 
+    # -----------------------------------
     # Register nodes
+    # -----------------------------------
 
     builder.add_node(
         "trip_request",
@@ -84,6 +87,11 @@ def create_travel_graph() -> StateGraph:
         itinerary_node,
     )
 
+    builder.add_node(
+        "persist",
+        persist_trip_node,
+    )
+
     # -----------------------------------
     # 1. Extract structured trip request
     # -----------------------------------
@@ -94,7 +102,7 @@ def create_travel_graph() -> StateGraph:
     )
 
     # -----------------------------------
-    # 2. Decide which agents are required
+    # 2. Orchestrator
     # -----------------------------------
 
     builder.add_edge(
@@ -103,7 +111,7 @@ def create_travel_graph() -> StateGraph:
     )
 
     # -----------------------------------
-    # 3. Validate required information
+    # 3. Validation
     # -----------------------------------
 
     builder.add_edge(
@@ -161,7 +169,7 @@ def create_travel_graph() -> StateGraph:
     )
 
     # -----------------------------------
-    # 6. Continue to itinerary if needed
+    # 6. Itinerary or persistence
     # -----------------------------------
 
     builder.add_conditional_edges(
@@ -169,12 +177,21 @@ def create_travel_graph() -> StateGraph:
         route_after_aggregation,
         {
             "itinerary": "itinerary",
-            "end": END,
+            "persist": "persist",
         },
     )
 
     builder.add_edge(
         "itinerary",
+        "persist",
+    )
+
+    # -----------------------------------
+    # 7. Finish after persistence
+    # -----------------------------------
+
+    builder.add_edge(
+        "persist",
         END,
     )
 

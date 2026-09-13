@@ -12,6 +12,9 @@ Requires-Dist: python-dotenv>=1.0
 Requires-Dist: mcp[cli]<2,>=1.24
 Requires-Dist: langchain-mcp-adapters<0.4,>=0.3.2
 Requires-Dist: httpx>=0.28
+Requires-Dist: sqlalchemy<3.0,>=2.0
+Requires-Dist: asyncpg>=0.29
+Requires-Dist: alembic>=1.13
 Provides-Extra: dev
 Requires-Dist: pytest>=8.0; extra == "dev"
 Requires-Dist: pytest-asyncio>=0.24; extra == "dev"

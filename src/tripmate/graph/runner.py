@@ -10,8 +10,10 @@ async def main() -> None:
     graph = compile_travel_graph()
 
     initial_state = {
+        "user_id": 1,
+
         "user_query": (
-            "Plan a Goa trip for me. "
+            "Plan a trip to Jeddah for me. "
             "Search for flights from BOM to JED "
             "on 2026-10-10. "
             "Find hotels in Jeddah from 2026-10-10 "
@@ -21,6 +23,7 @@ async def main() -> None:
             "Then create a travel itinerary using "
             "the available information."
         ),
+
         "completed_agents": [],
         "failed_agents": [],
     }
@@ -151,6 +154,29 @@ async def main() -> None:
         )
     )
 
+    print(
+        "\nTRIP SAVED:",
+        result.get(
+            "trip_saved"
+        )
+    )
+
+    print(
+        "SAVED TRIP ID:",
+        result.get(
+            "saved_trip_id"
+        )
+    )
+
+    print(
+        "PERSISTENCE ERROR:",
+        result.get(
+            "persistence_error"
+        )
+    )
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(
+        main()
+    )
