@@ -20,6 +20,7 @@ def validate_trip_request(
         decision.required_agents
     )
 
+    # Geographic locations
     origin = state.get(
         "origin"
     )
@@ -28,6 +29,16 @@ def validate_trip_request(
         "destination"
     )
 
+    # Airport codes
+    origin_airport = state.get(
+        "origin_airport"
+    )
+
+    destination_airport = state.get(
+        "destination_airport"
+    )
+
+    # Trip dates
     start_date = state.get(
         "start_date"
     )
@@ -36,18 +47,33 @@ def validate_trip_request(
         "end_date"
     )
 
+    # Travelers
     adults = state.get(
         "adults"
     )
 
+    # -----------------------------------
+    # Flight validation
+    # -----------------------------------
+
     if "flight" in required_agents:
 
-        if not origin:
+        # Flight search can use either
+        # airport code or geographic origin
+        if not (
+            origin_airport
+            or origin
+        ):
             errors.append(
                 "Flight search requires an origin."
             )
 
-        if not destination:
+        # Flight search can use either
+        # airport code or geographic destination
+        if not (
+            destination_airport
+            or destination
+        ):
             errors.append(
                 "Flight search requires a destination."
             )
@@ -57,11 +83,17 @@ def validate_trip_request(
                 "Flight search requires a departure date."
             )
 
+    # -----------------------------------
+    # Hotel validation
+    # -----------------------------------
+
     if "hotel" in required_agents:
 
+        # Hotels require a real geographic
+        # destination, not only an airport code
         if not destination:
             errors.append(
-                "Hotel search requires a destination."
+                "Hotel search requires a destination city."
             )
 
         if not start_date:
@@ -79,18 +111,29 @@ def validate_trip_request(
                 "Hotel search requires the number of adults."
             )
 
+    # -----------------------------------
+    # Weather validation
+    # -----------------------------------
+
     if "weather" in required_agents:
 
+        # Weather also requires a real location
         if not destination:
             errors.append(
-                "Weather search requires a destination."
+                "Weather search requires a destination city."
             )
+
+    # -----------------------------------
+    # Places validation
+    # -----------------------------------
 
     if "places" in required_agents:
 
+        # Places search requires a geographic
+        # destination, not an airport code
         if not destination:
             errors.append(
-                "Places search requires a destination."
+                "Places search requires a destination city."
             )
 
     return errors

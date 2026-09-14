@@ -132,54 +132,53 @@ class PlacesSearchResult(BaseModel):
     error: str | None = None
 
 class TripRequest(BaseModel):
+
     origin: str | None = Field(
         default=None,
-        description=(
-            "Trip origin or departure location."
-        ),
+        description="Origin city or geographic location.",
     )
 
     destination: str | None = Field(
         default=None,
-        description=(
-            "Trip destination."
-        ),
+        description="Destination city or geographic location.",
+    )
+
+    origin_airport: str | None = Field(
+        default=None,
+        description="Origin airport IATA code such as BOM.",
+    )
+
+    destination_airport: str | None = Field(
+        default=None,
+        description="Destination airport IATA code such as JED.",
+    )
+
+    destination_country: str | None = Field(
+        default=None,
+        description="Destination country such as Saudi Arabia.",
     )
 
     start_date: str | None = Field(
         default=None,
-        description=(
-            "Trip start date in YYYY-MM-DD format "
-            "when provided."
-        ),
+        description="Trip start date in YYYY-MM-DD format.",
     )
 
     end_date: str | None = Field(
         default=None,
-        description=(
-            "Trip end date in YYYY-MM-DD format "
-            "when provided."
-        ),
+        description="Trip end date in YYYY-MM-DD format.",
     )
 
     budget: float | None = Field(
         default=None,
-        description=(
-            "Total trip budget when explicitly "
-            "provided by the user."
-        ),
+        description="Total trip budget.",
     )
 
     adults: int | None = Field(
         default=None,
-        description=(
-            "Number of adult travelers when provided."
-        ),
+        description="Number of adult travelers.",
     )
 
     children: int | None = Field(
         default=None,
-        description=(
-            "Number of child travelers when provided."
-        ),
+        description="Number of child travelers.",
     )

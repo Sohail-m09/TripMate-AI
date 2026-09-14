@@ -32,6 +32,27 @@ async def main() -> None:
         initial_state
     )
 
+    print(
+        "\n=== MEMORY LOADED ==="
+    )
+
+    print(
+        result.get(
+            "memory_loaded"
+        )
+    )   
+
+
+    print(
+        "\n=== MEMORY CONTEXT ==="
+    )
+
+    print(
+        result.get(
+            "memory_context"
+        )
+    )
+
     print("\n=== ROUTING DECISION ===")
 
     routing_decision = result.get(

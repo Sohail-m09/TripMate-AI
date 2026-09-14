@@ -32,6 +32,9 @@ from tripmate.graph.agent_inputs import (
 from tripmate.graph.validation import (
     validate_trip_request,
 )
+from tripmate.database.trip_memory import (
+    build_trip_memory_context,
+)
 
 from tripmate.schemas import TravelAgentResponse
 from tripmate.state import TravelState
@@ -51,8 +54,19 @@ async def trip_request_node(
 
     return {
         "trip_request": trip_request,
+
         "origin": trip_request.origin,
         "destination": trip_request.destination,
+
+        "origin_airport":
+            trip_request.origin_airport,
+
+        "destination_airport":
+            trip_request.destination_airport,
+
+        "destination_country":
+            trip_request.destination_country,
+
         "start_date": trip_request.start_date,
         "end_date": trip_request.end_date,
         "budget": trip_request.budget,
@@ -504,6 +518,10 @@ async def itinerary_node(
             if places_result
             else None
         ),
+
+        memory_context=state.get(
+            "memory_context"
+        ),
     )
 
     return {
@@ -533,4 +551,55 @@ async def persist_trip_node(
         return {
             "trip_saved": False,
             "persistence_error": str(exc),
+        }
+
+async def memory_node(
+    state: TravelState,
+) -> dict:
+
+    user_id = state.get(
+        "user_id"
+    )
+
+    if user_id is None:
+
+        return {
+            "memory_loaded": False,
+            "memory_context": None,
+        }
+
+    decision = state.get(
+        "routing_decision"
+    )
+
+    if (
+        decision is None
+        or "itinerary"
+        not in decision.required_agents
+    ):
+
+        return {
+            "memory_loaded": False,
+            "memory_context": None,
+        }
+
+    try:
+
+        memory_context = (
+            await build_trip_memory_context(
+                user_id=user_id,
+                limit=3,
+            )
+        )
+
+        return {
+            "memory_loaded": True,
+            "memory_context": memory_context,
+        }
+
+    except Exception:
+
+        return {
+            "memory_loaded": False,
+            "memory_context": None,
         }

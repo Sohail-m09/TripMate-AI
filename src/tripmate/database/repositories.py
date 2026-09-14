@@ -9,6 +9,21 @@ from tripmate.database.models import (
     User,
 )
 
+async def get_user_by_id(
+    session: AsyncSession,
+    user_id: int,
+) -> User | None:
+
+    statement = select(User).where(
+        User.id == user_id
+    )
+
+    result = await session.execute(
+        statement
+    )
+
+    return result.scalar_one_or_none()
+
 
 async def get_user_by_email(
     session: AsyncSession,
@@ -111,6 +126,31 @@ async def get_user_trips(
         .order_by(
             Trip.created_at.desc()
         )
+    )
+
+    result = await session.execute(
+        statement
+    )
+
+    return list(
+        result.scalars().all()
+    )
+
+async def get_recent_user_trips(
+    session: AsyncSession,
+    user_id: int,
+    limit: int = 3,
+) -> list[Trip]:
+
+    statement = (
+        select(Trip)
+        .where(
+            Trip.user_id == user_id
+        )
+        .order_by(
+            Trip.created_at.desc()
+        )
+        .limit(limit)
     )
 
     result = await session.execute(

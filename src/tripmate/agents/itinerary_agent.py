@@ -5,6 +5,7 @@ from langchain_core.messages import (
     SystemMessage,
 )
 
+from tripmate import state
 from tripmate.agents.prompts import (
     ITINERARY_AGENT_PROMPT,
 )
@@ -21,25 +22,35 @@ async def run_itinerary_agent(
     hotel_info: str | None = None,
     weather_info: str | None = None,
     places_info: str | None = None,
+    memory_context: str | None = None,
 ) -> TravelAgentResponse:
 
     model = get_gemini_model()
 
+    memory_section = (
+        memory_context
+        if memory_context
+        else "No previous trip history is available."
+    )
+
     context = f"""
-User request:
+Current User Request:
 {user_query}
 
-Flight information:
-{flight_info or "Not available"}
+Flight Information:
+{flight_info or "Not available."}
 
-Hotel information:
-{hotel_info or "Not available"}
+Hotel Information:
+{hotel_info or "Not available."}
 
-Weather information:
-{weather_info or "Not available"}
+Weather Information:
+{weather_info or "Not available."}
 
-Places information:
-{places_info or "Not available"}
+Places Information:
+{places_info or "Not available."}
+
+Previous Trip History:
+{memory_section}
 """
 
     messages = [
@@ -55,11 +66,13 @@ Places information:
         messages
     )
 
+    answer = extract_message_text(
+        response.content
+    )
+
     return TravelAgentResponse(
-        answer=extract_message_text(
-            response.content
-        ),
-        tools_used = [],
+        answer=answer,
+        tools_used=[],
         is_complete=True,
     )
 
@@ -86,6 +99,9 @@ async def main() -> None:
         places_info=(
             "Available places include Baga Beach, "
             "Calangute Beach, and Basilica of Bom Jesus."
+        ),
+        memory_context=state.get(
+        "memory_context"
         ),
     )
 

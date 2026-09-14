@@ -43,12 +43,12 @@ async def extract_trip_request(
 async def main() -> None:
 
     result = await extract_trip_request(
-        (
-            "Plan a Goa trip from Mumbai. "
-            "Travel from 2026-10-10 to "
-            "2026-10-15 for 2 adults. "
-            "My budget is 50000 rupees."
-        )
+        "Plan a trip to Jeddah, Saudi Arabia. "
+        "Search for flights from BOM to JED "
+        "on 2026-10-10. "
+        "Find hotels in Jeddah, Saudi Arabia "
+        "from 2026-10-10 to 2026-10-15 "
+        "for 2 adults."
     )
 
     print(

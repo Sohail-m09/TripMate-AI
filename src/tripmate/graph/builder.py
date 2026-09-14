@@ -10,6 +10,7 @@ from tripmate.graph.nodes import (
     flight_node,
     hotel_node,
     itinerary_node,
+    memory_node,
     orchestrator_node,
     persist_trip_node,
     places_node,
@@ -50,6 +51,11 @@ def create_travel_graph() -> StateGraph:
     builder.add_node(
         "validation",
         validation_node,
+    )
+
+    builder.add_node(
+        "memory",
+        memory_node,
     )
 
     builder.add_node(
@@ -123,9 +129,18 @@ def create_travel_graph() -> StateGraph:
         "validation",
         route_after_validation,
         {
-            "continue": "dispatch",
+            "continue": "memory",
             "end": END,
         },
+    )
+
+    # -----------------------------------
+    # 4. Load persistent memory
+    # -----------------------------------
+    
+    builder.add_edge(
+        "memory",
+        "dispatch", 
     )
 
     # -----------------------------------

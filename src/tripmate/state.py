@@ -39,6 +39,18 @@ class TravelState(TypedDict):
     ]
 
     # -----------------------------------
+    # Memory
+    # -----------------------------------
+
+    memory_loaded: NotRequired[
+        bool
+    ]
+
+    memory_context: NotRequired[
+        str | None
+    ]
+
+    # -----------------------------------
     # Trip information
     # -----------------------------------
 
@@ -47,6 +59,18 @@ class TravelState(TypedDict):
     ]
 
     destination: NotRequired[
+        str | None
+    ]
+
+    origin_airport: NotRequired[
+        str | None
+    ]
+
+    destination_airport: NotRequired[
+        str | None
+    ]
+
+    destination_country: NotRequired[
         str | None
     ]
 
