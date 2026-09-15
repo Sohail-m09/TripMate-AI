@@ -5,7 +5,6 @@ from langchain_core.messages import (
     SystemMessage,
 )
 
-from tripmate import state
 from tripmate.agents.prompts import (
     ITINERARY_AGENT_PROMPT,
 )
@@ -100,8 +99,9 @@ async def main() -> None:
             "Available places include Baga Beach, "
             "Calangute Beach, and Basilica of Bom Jesus."
         ),
-        memory_context=state.get(
-        "memory_context"
+        memory_context=(
+            "Previous trip: Mumbai to Goa "
+            "for 3 days."
         ),
     )
 

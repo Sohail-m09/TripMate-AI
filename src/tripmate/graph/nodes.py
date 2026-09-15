@@ -550,6 +550,7 @@ async def persist_trip_node(
 
         return {
             "trip_saved": False,
+            "saved_trip_id": None,
             "persistence_error": str(exc),
         }
 

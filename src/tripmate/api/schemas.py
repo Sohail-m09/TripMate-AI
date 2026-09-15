@@ -50,6 +50,14 @@ class TripPlanResponse(BaseModel):
         ),
     )
 
+    flight_result: AgentResultResponse | None = None
+
+    hotel_result: AgentResultResponse | None = None
+
+    weather_result: AgentResultResponse | None = None
+
+    places_result: AgentResultResponse | None = None
+
     required_agents: list[str] = Field(
         default_factory=list,
         description=(
