@@ -1,0 +1,39 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: tripmate-api
+
+    env_file:
+      - .env.docker
+
+    ports:
+      - "8000:8000"
+
+    networks:
+      - tripmate-network
+
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+
+    container_name: tripmate-ui
+
+    environment:
+      API_BASE_URL: http://api:8000
+
+    ports:
+      - "8501:8501"
+
+    depends_on:
+      - api
+
+    networks:
+      - tripmate-network
+
+networks:
+  tripmate-network:
+    driver: bridge

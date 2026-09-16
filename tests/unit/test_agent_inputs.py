@@ -78,7 +78,7 @@ def test_flight_input_prefers_airport_codes():
     assert "Departure date: 2026-11-10" in agent_input
 
 
-def test_flight_input_falls_back_to_city():
+def test_flight_input_does_not_fall_back_to_city():
 
     state = make_state(
         origin="Mumbai",
@@ -92,8 +92,11 @@ def test_flight_input_falls_back_to_city():
         state
     )
 
-    assert "Origin: Mumbai" in agent_input
-    assert "Destination: Dubai" in agent_input
+    assert "Origin: Not provided" in agent_input
+    assert "Destination: Not provided" in agent_input
+
+    assert "Origin: Mumbai" not in agent_input
+    assert "Destination: Dubai" not in agent_input
 
 
 def test_hotel_input_uses_geographic_destination():

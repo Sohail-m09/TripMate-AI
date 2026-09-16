@@ -4,7 +4,9 @@ from tripmate.graph.validation import (
 from tripmate.schemas import (
     RoutingDecision,
 )
-
+from tripmate.graph.validation import (
+    validate_travel_request,
+)
 
 def make_state(
     required_agents: list[str],
@@ -201,3 +203,31 @@ def test_complete_trip_request():
     )
 
     assert errors == []
+
+def test_flight_rejects_city_names_without_airports():
+
+    state = {
+        "origin": "Delhi",
+        "destination": "Bangkok",
+        "start_date": "2026-12-05",
+        "routing_decision": RoutingDecision(
+            required_agents=["flight"],
+            reason="Flight requested.",
+        ),
+    }
+
+    errors = validate_travel_request(
+        state
+    )
+
+    assert (
+        "Flight search requires a "
+        "valid origin airport."
+        in errors
+    )
+
+    assert (
+        "Flight search requires a "
+        "valid destination airport."
+        in errors
+    )

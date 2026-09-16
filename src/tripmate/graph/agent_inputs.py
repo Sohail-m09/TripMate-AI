@@ -20,30 +20,40 @@ def build_destination_location(
 
 
 def build_flight_agent_input(
-    state: TravelState,
-) -> str:
+    state,
+):
 
-    origin = (
-        state.get("origin_airport")
-        or state.get("origin")
+    origin = state.get(
+        "origin_airport"
     )
 
-    destination = (
-        state.get("destination_airport")
-        or state.get("destination")
+    destination = state.get(
+        "destination_airport"
     )
 
     start_date = state.get(
         "start_date"
     )
 
+    adults = state.get(
+        "adults"
+    )
+
+    children = state.get(
+        "children"
+    )
+
     return (
-        "Search for flight options using only "
-        "the following trip information.\n"
-        f"Origin: {origin or 'Not provided'}\n"
-        f"Destination: {destination or 'Not provided'}\n"
+        f"Origin: "
+        f"{origin or 'Not provided'}\n"
+        f"Destination: "
+        f"{destination or 'Not provided'}\n"
         f"Departure date: "
-        f"{start_date or 'Not provided'}"
+        f"{start_date or 'Not provided'}\n"
+        f"Adults: "
+        f"{adults if adults is not None else 'Not provided'}\n"
+        f"Children: "
+        f"{children if children is not None else 'Not provided'}"
     )
 
 

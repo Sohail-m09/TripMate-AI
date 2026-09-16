@@ -1,11 +1,12 @@
 import asyncio
+
 from tripmate.providers.errors import ProviderError
+from tripmate.providers.factory import (
+    get_travel_search_provider,
+)
 from tripmate.schemas import (
     FlightOption,
     FlightSearchResult,
-)
-from tripmate.providers.factory import (
-    get_travel_search_provider,
 )
 
 
@@ -30,12 +31,6 @@ async def search_flights(
             error=str(exc),
         )
 
-    data = await provider.search_flights(
-        departure_id=departure_id,
-        arrival_id=arrival_id,
-        outbound_date=outbound_date,
-    )
-
     flights = (
         data.get("best_flights")
         or data.get("other_flights")
@@ -45,7 +40,10 @@ async def search_flights(
     if not flights:
         return FlightSearchResult(
             success=False,
-            error="No flights were found for the requested route.",
+            error=(
+                "No flights were found "
+                "for the requested route."
+            ),
         )
 
     results: list[FlightOption] = []
@@ -54,7 +52,7 @@ async def search_flights(
 
         segments = option.get(
             "flights",
-            []
+            [],
         )
 
         if not segments:
@@ -65,12 +63,12 @@ async def search_flights(
 
         departure = first_segment.get(
             "departure_airport",
-            {}
+            {},
         )
 
         arrival = last_segment.get(
             "arrival_airport",
-            {}
+            {},
         )
 
         airlines = []
@@ -91,21 +89,23 @@ async def search_flights(
 
         price = option.get(
             "price",
-            "N/A"
+            "N/A",
         )
 
         duration = option.get(
             "total_duration",
-            "N/A"
+            "N/A",
         )
 
         stops = max(
             len(segments) - 1,
-            0
+            0,
         )
 
         result = FlightOption(
-            airline=", ".join(airlines),
+            airline=", ".join(
+                airlines
+            ),
             departure_time=departure.get(
                 "time",
                 "N/A",
@@ -116,18 +116,26 @@ async def search_flights(
             ),
             duration_minutes=(
                 duration
-                if isinstance(duration, int)
+                if isinstance(
+                    duration,
+                    int,
+                )
                 else None
             ),
             stops=stops,
             price=(
                 float(price)
-                if isinstance(price, (int, float))
+                if isinstance(
+                    price,
+                    (int, float),
+                )
                 else None
             ),
-    )
+        )
 
-        results.append(result)
+        results.append(
+            result
+        )
 
     return FlightSearchResult(
         success=True,
@@ -143,7 +151,9 @@ async def main() -> None:
         outbound_date="2026-10-10",
     )
 
-    print(result)
+    print(
+        result
+    )
 
 
 if __name__ == "__main__":

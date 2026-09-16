@@ -58,29 +58,28 @@ def validate_trip_request(
 
     if "flight" in required_agents:
 
-        # Flight search can use either
-        # airport code or geographic origin
-        if not (
-            origin_airport
-            or origin
+        if not state.get(
+            "origin_airport"
         ):
             errors.append(
-                "Flight search requires an origin."
+                "Flight search requires a "
+                "valid origin airport."
             )
 
-        # Flight search can use either
-        # airport code or geographic destination
-        if not (
-            destination_airport
-            or destination
+        if not state.get(
+            "destination_airport"
         ):
             errors.append(
-                "Flight search requires a destination."
+                "Flight search requires a "
+                "valid destination airport."
             )
 
-        if not start_date:
+        if not state.get(
+            "start_date"
+        ):
             errors.append(
-                "Flight search requires a departure date."
+                "Flight search requires a "
+                "departure date."
             )
 
     # -----------------------------------
